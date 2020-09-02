@@ -1,0 +1,75 @@
+﻿@using Microsoft.AspNetCore.Http;
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor;
+
+@model IEnumerable<HttpRestDriveAccess.Models.GoogleDriveFiles>
+
+<form asp-controller="Home" asp-action="UploadFile" method="post"
+      enctype="multipart/form-data">
+
+    <input type="file" name="file" />
+    <button type="submit">Upload File</button>
+
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Size)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null)
+        {
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @{
+                            string kiloByte = $"{item.Size / 100} Bytes";
+
+                            @Html.DisplayFor(modelItem => kiloByte);
+                        }
+                    </td>
+                    <td>
+                        @Html.ActionLink("Download", "Download", "Home", new { fileId = item.Id })
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+        <td colspan="6">No files found</td>
+    }
+        </tbody>
+    </table>
+
+    @{
+        string value = HttpContextAccessor.HttpContext.Session.GetInt32("_accessTokens").ToString();
+
+        if (string.IsNullOrEmpty(value))
+        {
+            <div>
+                @Html.ActionLink("Google Login", "Login")
+            </div>
+        }
+        else
+        {
+            <div>
+                @Html.ActionLink("Signout", "SignOut")
+            </div>
+        }
+    }
